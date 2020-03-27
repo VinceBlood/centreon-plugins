@@ -39,12 +39,9 @@ sub new {
         'load'        => 'snmp_standard::mode::loadaverage',
         'storage'     => 'snmp_standard::mode::storage',
         'temperature' => 'storage::synology::snmp::mode::temperature',
-<<<<<<< HEAD
         'ups'         => 'storage::synology::snmp::mode::ups',
 		'hastatus' => 'storage::synology::snmp::mode::hastatus',
-=======
         'ups'         => 'storage::synology::snmp::mode::ups'
->>>>>>> upstream/master
     );
 
     return $self;
