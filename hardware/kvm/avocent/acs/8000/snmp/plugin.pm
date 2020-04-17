@@ -1,5 +1,5 @@
 #
-# Copyright 2020 Centreon (http://www.centreon.com/)
+# Copyright 2019 Centreon (http://www.centreon.com/)
 #
 # Centreon is a full-fledged industry-strength solution that meets
 # the needs in IT infrastructure and application monitoring for
@@ -18,21 +18,24 @@
 # limitations under the License.
 #
 
-package apps::hddtemp::remote::plugin;
+package hardware::kvm::avocent::acs::8000::snmp::plugin;
 
 use strict;
 use warnings;
-use base qw(centreon::plugins::script_simple);
+use base qw(centreon::plugins::script_snmp);
 
 sub new {
     my ($class, %options) = @_;
     my $self = $class->SUPER::new(package => __PACKAGE__, %options);
     bless $self, $class;
 
-    $self->{version} = '0.1';
+    $self->{version} = '1.0';
     %{$self->{modes}} = (
-        'temperature' => 'apps::hddtemp::remote::mode::temperature',
-        'list-drives' => 'apps::hddtemp::remote::mode::listdrives',
+        'cpu-detailed'  => 'snmp_standard::mode::cpudetailed',
+        'hardware'      => 'hardware::kvm::avocent::acs::8000::snmp::mode::hardware',
+        'load'          => 'snmp_standard::mode::loadaverage',
+        'memory'        => 'snmp_standard::mode::memory',
+        'serial-ports'  => 'hardware::kvm::avocent::acs::8000::snmp::mode::serialports'
     );
 
     return $self;
@@ -44,6 +47,6 @@ __END__
 
 =head1 PLUGIN DESCRIPTION
 
-Check HDDTEMP Status throuh TCP Socket
+Check Avocent ACS 8000 series in SNMP.
 
 =cut

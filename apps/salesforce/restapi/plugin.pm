@@ -18,11 +18,11 @@
 # limitations under the License.
 #
 
-package apps::hddtemp::local::plugin;
+package apps::salesforce::restapi::plugin;
 
 use strict;
 use warnings;
-use base qw(centreon::plugins::script_simple);
+use base qw(centreon::plugins::script_custom);
 
 sub new {
     my ($class, %options) = @_;
@@ -30,10 +30,10 @@ sub new {
     bless $self, $class;
 
     $self->{version} = '0.1';
-    %{$self->{modes}} = (
-        'temperature' => 'apps::hddtemp::local::mode::temperature',
+    %{$self->{modes}} = ( 
+        'sfdc-instance' => 'apps::salesforce::restapi::mode::sfdcinstance',
     );
-
+    $self->{custom_modes}{api} = 'apps::salesforce::restapi::custom::api';
     return $self;
 }
 
@@ -43,6 +43,6 @@ __END__
 
 =head1 PLUGIN DESCRIPTION
 
-Check Linux through local commands (the plugin can use SSH).
+Check SFDC service through its status API
 
 =cut
