@@ -301,7 +301,7 @@ sub ec2_get_instances_status {
 
         foreach (@{$instances->{InstanceStatuses}}) {
             $instance_results->{$_->{InstanceId}} = { state => $_->{InstanceState}->{Name},
-                                                      status => => $_->{InstanceStatus}->{Status} };
+                                                      status => $_->{InstanceStatus}->{Status} };
         }
     };
     if ($@) {
@@ -310,6 +310,55 @@ sub ec2_get_instances_status {
     }
 
     return $instance_results;
+}
+
+sub ec2spot_get_active_instances {
+    my ($self, %options) = @_;
+
+    my $instance_results = {};
+    eval {
+        my $lwp_caller = new Paws::Net::LWPCaller();
+        my $ec2 = Paws->service('EC2', caller => $lwp_caller, region => $options{region});
+        my $instances = $ec2->DescribeSpotFleetInstances('SpotFleetRequestId' => $options{spot_fleet_request_id}, DryRun => 0, IncludeAllInstances => 1);
+
+        foreach (@{$instances->{ActiveInstances}}) {
+            $instance_results->{$_->{InstanceId}} = {
+                health      => $_->{InstanceHealth},
+                type        => $_->{InstanceType},
+                request_id  => $_->{SpotInstanceRequestId} };
+        }
+    };
+    if ($@) {
+        $self->{output}->add_option_msg(short_msg => "error: $@");
+        $self->{output}->option_exit();
+    }
+
+    return $instance_results;
+}
+
+sub ec2spot_list_fleet_requests {
+    my ($self, %options) = @_;
+
+    my $resource_results = [];
+    eval {
+        my $lwp_caller = new Paws::Net::LWPCaller();
+        my $ec2spot = Paws->service('EC2', caller => $lwp_caller, region => $options{region});
+        my $spot_fleet_requests = $ec2spot->DescribeSpotFleetRequests(DryRun => 0);
+
+        foreach (@{$spot_fleet_requests->{SpotFleetRequestConfigs}}) {
+            push @{$resource_results}, {
+                SpotFleetRequestState => $_->{SpotFleetRequestState},
+                SpotFleetRequestId    => $_->{SpotFleetRequestId},
+                ActivityStatus        => $_->{ActivityStatus}
+            };
+        }
+    };
+    if ($@) {
+        $self->{output}->add_option_msg(short_msg => "error: $@");
+        $self->{output}->option_exit();
+    }
+
+    return $resource_results;
 }
 
 sub ec2_list_resources {
@@ -451,7 +500,7 @@ sub vpn_list_connections {
     my $connections_results = [];
     eval {
         my $lwp_caller = new Paws::Net::LWPCaller();
-        my $rds = Paws->service('EC2', caller => $lwp_caller, region => $options{region});
+        my $vpn = Paws->service('EC2', caller => $lwp_caller, region => $options{region});
         my $list_vpn = $vpn->DescribeVpnConnections();
         foreach my $connection (@{$list_vpn->{VpnConnections}}) {
             my @name_tags;

@@ -18,11 +18,11 @@
 # limitations under the License.
 #
 
-package apps::bluemind::plugin;
+package apps::bluemind::local::plugin;
 
 use strict;
 use warnings;
-use base qw(centreon::plugins::script_simple);
+use base qw(centreon::plugins::script_custom);
 
 sub new {
     my ($class, %options) = @_;
@@ -31,10 +31,18 @@ sub new {
     bless $self, $class;
 
     $self->{version} = '0.1';
-    %{$self->{modes}} = (
-        'incoming' => 'apps::bluemind::mode::incoming',
-    );
+    $self->{modes} = {
+        'core'      => 'apps::bluemind::local::mode::core',
+        'eas'       => 'apps::bluemind::local::mode::eas',
+        'hps'       => 'apps::bluemind::local::mode::hps',
+        'ips'       => 'apps::bluemind::local::mode::ips',
+        'lmtpd'     => 'apps::bluemind::local::mode::lmtpd',
+        'milter'    => 'apps::bluemind::local::mode::milter',
+        'webserver' => 'apps::bluemind::local::mode::webserver',
+        'xmpp'      => 'apps::bluemind::local::mode::xmpp'
+    };
 
+    $self->{custom_modes}{api} = 'apps::bluemind::local::custom::api';
     return $self;
 }
 
@@ -45,6 +53,6 @@ __END__
 
 =head1 PLUGIN DESCRIPTION
 
-Check BlueMind through InfluxDB API
+Check BlueMind through bm-metrics sockets
 
 =cut
