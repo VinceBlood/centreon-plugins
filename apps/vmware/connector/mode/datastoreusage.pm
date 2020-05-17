@@ -33,24 +33,17 @@ sub custom_status_output {
     return $msg;
 }
 
-sub custom_status_calc {
-    my ($self, %options) = @_;
-
-    $self->{result_values}->{accessible} = $options{new_datas}->{$self->{instance} . '_accessible'};
-    return 0;
-}
-
 sub custom_usage_output {
     my ($self, %options) = @_;
 
-    my ($total_size_value, $total_size_unit) = $self->{perfdata}->change_bytes(value => $self->{result_values}->{total_space_absolute});
-    my ($total_used_value, $total_used_unit) = $self->{perfdata}->change_bytes(value => $self->{result_values}->{used_space_absolute});
-    my ($total_free_value, $total_free_unit) = $self->{perfdata}->change_bytes(value => $self->{result_values}->{free_space_absolute});
+    my ($total_size_value, $total_size_unit) = $self->{perfdata}->change_bytes(value => $self->{result_values}->{total_space});
+    my ($total_used_value, $total_used_unit) = $self->{perfdata}->change_bytes(value => $self->{result_values}->{used_space});
+    my ($total_free_value, $total_free_unit) = $self->{perfdata}->change_bytes(value => $self->{result_values}->{free_space});
     my $msg = sprintf(
         'Usage Total: %s Used: %s (%.2f%%) Free: %s (%.2f%%)',
         $total_size_value . " " . $total_size_unit,
-        $total_used_value . " " . $total_used_unit, $self->{result_values}->{prct_used_space_absolute},
-        $total_free_value . " " . $total_free_unit, $self->{result_values}->{prct_free_space_absolute}
+        $total_used_value . " " . $total_used_unit, $self->{result_values}->{prct_used_space},
+        $total_free_value . " " . $total_free_unit, $self->{result_values}->{prct_free_space}
     );
     return $msg;
 }
@@ -94,7 +87,6 @@ sub set_counters {
     $self->{maps_counters}->{datastore} = [
         { label => 'status', threshold => 0, set => {
                 key_values => [ { name => 'accessible' }, { name => 'display' } ],
-                closure_custom_calc => $self->can('custom_status_calc'),
                 closure_custom_output => $self->can('custom_status_output'),
                 closure_custom_perfdata => sub { return 0; },
                 closure_custom_threshold_check => \&catalog_status_threshold,
@@ -104,8 +96,8 @@ sub set_counters {
                 key_values => [ { name => 'used_space' }, { name => 'free_space' }, { name => 'prct_used_space' }, { name => 'prct_free_space' }, { name => 'total_space' }, { name => 'display' },  ],
                 closure_custom_output => $self->can('custom_usage_output'),
                 perfdatas => [
-                    { label => 'used', value => 'used_space_absolute', template => '%d', min => 0, max => 'total_space_absolute',
-                      unit => 'B', cast_int => 1, label_extra_instance => 1, instance_use => 'display_absolute' },
+                    { label => 'used', value => 'used_space', template => '%d', min => 0, max => 'total_space',
+                      unit => 'B', cast_int => 1, label_extra_instance => 1, instance_use => 'display' },
                 ],
             }
         },
@@ -113,8 +105,8 @@ sub set_counters {
                 key_values => [ { name => 'free_space' }, { name => 'used_space' }, { name => 'prct_used_space' }, { name => 'prct_free_space' }, { name => 'total_space' }, { name => 'display' },  ],
                 closure_custom_output => $self->can('custom_usage_output'),
                 perfdatas => [
-                    { label => 'free', value => 'free_space_absolute', template => '%d', min => 0, max => 'total_space_absolute',
-                      unit => 'B', cast_int => 1, label_extra_instance => 1, instance_use => 'display_absolute' },
+                    { label => 'free', value => 'free_space', template => '%d', min => 0, max => 'total_space',
+                      unit => 'B', cast_int => 1, label_extra_instance => 1, instance_use => 'display' },
                 ],
             }
         },
@@ -122,8 +114,8 @@ sub set_counters {
                 key_values => [ { name => 'prct_used_space' }, { name => 'display' } ],
                 output_template => 'used : %.2f %%',
                 perfdatas => [
-                    { label => 'used_prct', value => 'prct_used_space_absolute', template => '%.2f', min => 0, max => 100,
-                      unit => '%', label_extra_instance => 1, instance_use => 'display_absolute' },
+                    { label => 'used_prct', value => 'prct_used_space', template => '%.2f', min => 0, max => 100,
+                      unit => '%', label_extra_instance => 1, instance_use => 'display' },
                 ],
             }
         },

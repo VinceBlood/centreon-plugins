@@ -70,19 +70,6 @@ sub custom_status_output {
     return $msg;
 }
 
-sub custom_status_calc {
-    my ($self, %options) = @_;
-
-    $self->{result_values}->{entity_name} = $options{new_datas}->{$self->{instance} . '_entity_name'};
-    $self->{result_values}->{status} = $options{new_datas}->{$self->{instance} . '_status'};
-    $self->{result_values}->{name} = $options{new_datas}->{$self->{instance} . '_name'};
-    $self->{result_values}->{type} = $options{new_datas}->{$self->{instance} . '_type'};
-    $self->{result_values}->{since} = $options{new_datas}->{$self->{instance} . '_since'};
-    $self->{result_values}->{description} = $options{new_datas}->{$self->{instance} . '_description'};
-    $self->{result_values}->{time} = $options{new_datas}->{$self->{instance} . '_time'};
-    return 0;
-}
-
 sub custom_dcmetrics_perfdata {
     my ($self, %options) = @_;
 
@@ -128,7 +115,7 @@ sub set_counters {
                 key_values => [ { name => 'yellow' } ],
                 output_template => '%s warning alarm(s) found(s)',
                 perfdatas => [
-                    { label => 'total_alarm_warning', value => 'yellow_absolute', template => '%s', min => 0 },
+                    { label => 'total_alarm_warning', value => 'yellow', template => '%s', min => 0 },
                 ],
             }
         },
@@ -136,7 +123,7 @@ sub set_counters {
                 key_values => [ { name => 'red' } ],
                 output_template => '%s critical alarm(s) found(s)',
                 perfdatas => [
-                    { label => 'total_alarm_critical', value => 'red_absolute', template => '%s', min => 0 },
+                    { label => 'total_alarm_critical', value => 'red', template => '%s', min => 0 },
                 ],
             }
         },
@@ -146,7 +133,6 @@ sub set_counters {
         { label => 'status', threshold => 0, set => {
                 key_values => [ { name => 'entity_name' }, { name => 'status' }, 
                     { name => 'time' }, { name => 'description' }, { name => 'name' }, { name => 'type' }, { name => 'since' } ],
-                closure_custom_calc => $self->can('custom_status_calc'),
                 closure_custom_output => $self->can('custom_status_output'),
                 closure_custom_perfdata => sub { return 0; },
                 closure_custom_threshold_check => \&catalog_status_threshold,

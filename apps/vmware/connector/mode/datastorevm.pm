@@ -34,14 +34,6 @@ sub custom_status_output {
     return $msg;
 }
 
-sub custom_status_calc {
-    my ($self, %options) = @_;
-
-    $self->{result_values}->{connection_state} = $options{new_datas}->{$self->{instance} . '_connection_state'};
-    $self->{result_values}->{power_state} = $options{new_datas}->{$self->{instance} . '_power_state'};
-    return 0;
-}
-
 sub set_counters {
     my ($self, %options) = @_;
 
@@ -58,7 +50,6 @@ sub set_counters {
     $self->{maps_counters}->{global} = [
         { label => 'status', threshold => 0, set => {
                 key_values => [ { name => 'connection_state' }, { name => 'power_state' } ],
-                closure_custom_calc => $self->can('custom_status_calc'),
                 closure_custom_output => $self->can('custom_status_output'),
                 closure_custom_perfdata => sub { return 0; },
                 closure_custom_threshold_check => \&catalog_status_threshold,
@@ -71,7 +62,7 @@ sub set_counters {
                 key_values => [ { name => 'total_latency' } ],
                 output_template => 'max total latency is %s ms',
                 perfdatas => [
-                    { label => 'max_total_latency', value => 'total_latency_absolute', template => '%s', unit => 'ms', 
+                    { label => 'max_total_latency', value => 'total_latency', template => '%s', unit => 'ms', 
                       min => 0, label_extra_instance => 1 },
                 ],
             }
@@ -83,7 +74,7 @@ sub set_counters {
                 key_values => [ { name => 'read' } ],
                 output_template => '%s read iops',
                 perfdatas => [
-                    { label => 'riops', value => 'read_absolute', template => '%s', unit => 'iops', 
+                    { label => 'riops', value => 'read', template => '%s', unit => 'iops', 
                       min => 0, label_extra_instance => 1 },
                 ],
             }
@@ -92,8 +83,8 @@ sub set_counters {
                 key_values => [ { name => 'write' } ],
                 output_template => '%s write iops',
                 perfdatas => [
-                    { label => 'wiops', value => 'write_absolute', template => '%s', unit => 'iops', 
-                      min => 0, max => 'write_absolute', label_extra_instance => 1 },
+                    { label => 'wiops', value => 'write', template => '%s', unit => 'iops', 
+                      min => 0, max => 'write', label_extra_instance => 1 },
                 ],
             }
         },

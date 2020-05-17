@@ -33,18 +33,10 @@ sub custom_status_output {
     return $msg;
 }
 
-sub custom_status_calc {
-    my ($self, %options) = @_;
-
-    $self->{result_values}->{connection_state} = $options{new_datas}->{$self->{instance} . '_connection_state'};
-    $self->{result_values}->{power_state} = $options{new_datas}->{$self->{instance} . '_power_state'};
-    return 0;
-}
-
 sub custom_device_output {
     my ($self, %options) = @_;
 
-    my $msg = sprintf("%s %s device connected",  $self->{result_values}->{device_connected_absolute}, $self->{instance_mode}->{option_results}->{device});
+    my $msg = sprintf("%s %s device connected",  $self->{result_values}->{device_connected}, $self->{instance_mode}->{option_results}->{device});
     return $msg;
 }
 
@@ -61,7 +53,7 @@ sub set_counters {
                 key_values => [ { name => 'device_connected' } ],
                 closure_custom_output => $self->can('custom_device_output'),
                 perfdatas => [
-                    { label => 'total_device_connected', value => 'device_connected_absolute', template => '%s',
+                    { label => 'total_device_connected', value => 'device_connected', template => '%s',
                       min => 0 },
                 ],
             }
@@ -71,7 +63,6 @@ sub set_counters {
     $self->{maps_counters}->{vm} = [
         { label => 'status', threshold => 0, set => {
                 key_values => [ { name => 'connection_state' }, { name => 'power_state' } ],
-                closure_custom_calc => $self->can('custom_status_calc'),
                 closure_custom_output => $self->can('custom_status_output'),
                 closure_custom_perfdata => sub { return 0; },
                 closure_custom_threshold_check => \&catalog_status_threshold,
@@ -81,7 +72,7 @@ sub set_counters {
                 key_values => [ { name => 'device_connected' }, { name => 'display' } ],
                 oclosure_custom_output => $self->can('custom_device_output'),
                 perfdatas => [
-                    { label => 'device_connected', value => 'device_connected_absolute', template => '%s',
+                    { label => 'device_connected', value => 'device_connected', template => '%s',
                       min => 0, label_extra_instance => 1 },
                 ],
             }
